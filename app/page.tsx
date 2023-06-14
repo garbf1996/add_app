@@ -1,16 +1,32 @@
 "use client";
 import Image from "next/image";
-
+import { redirect } from "next/navigation";
 import { supabase } from "../supabase/supabase";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  //estado session
+
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    const getSession = async () => {
+      const session = await supabase.auth.getSession();
+      setSession(session);
+    };
+    getSession();
+  }, []);
+
+  if (session) {
+    redirect("/dashboard");
+  }
+
   const ProveGoogle = async (e: any) => {
     e.preventDefault();
     try {
-      const resultado = await supabase.auth.signInWithOAuth({
+      await supabase.auth.signInWithOAuth({
         provider: "google",
       });
-      console.log(resultado);
     } catch (error) {
       console.log(error);
     }
